@@ -12,8 +12,9 @@ description: """
 Tool to inject new <.provision> section into given ELF binary file.
 """
 
-build: [ "dune" "build" "-p" name "-j" jobs ]
-run-test: [ "dune" "runtest" "-p" name "-j" jobs ]
+build: [ ["dune" "subst"] {dev}
+         ["dune" "build" "-p" name "-j" jobs ]
+         ["dune" "runtest" "-p" name "-j" jobs] {with-test} ]
 
 depends: [
   "ocaml"          {>= "4.07.0"}
@@ -27,4 +28,10 @@ depends: [
   "rresult"
   "mmap"
   "cmdliner"
+]
+depopts: [
+  "ocaml-freestanding"
+]
+conflicts: [
+  "ocaml-freestanding" {< "0.6.0"}
 ]

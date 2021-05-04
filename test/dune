@@ -1,12 +1,14 @@
 (rule
  (targets ex01.c.exe)
  (deps (:provision provision))
- (action (run %{exe:../bin/caravan.exe} -i %{exe:../example/ex01.exe} -p %{provision} %{targets})))
+ (action (progn (run %{exe:../bin/caravan.exe} -i %{exe:../example/ex01.exe} -p %{provision} %{targets}) (run chmod +x ex01.c.exe))))
 
-(rule (with-stdout-to result.output (run %{exe:ex01.c.exe})))
+(rule
+ (targets result.output)
+ (deps %{exe:ex01.c.exe})
+ (action (with-stdout-to result.output (run %{exe:ex01.c.exe}))))
 
-(alias
- (name runtest)
- (package caravan)
+(rule
+ (alias runtest)
  (deps (:output result.output) (:expected result.expected))
- (action (run diff -uw %{output} %{expected})))
+ (action (diff %{output} %{expected})))

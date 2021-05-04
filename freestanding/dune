@@ -1,0 +1,14 @@
+(copy_files# ../lib/*.c)
+
+(rule
+ (deps Makefile load.c)
+ (targets libprovision_freestanding_stubs.a)
+ (action
+  (no-infer
+   (progn
+    (run %{make})))))
+
+(install
+ (package provision)
+ (section lib)
+ (files libprovision_freestanding_stubs.a))
