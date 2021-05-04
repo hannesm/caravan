@@ -1193,7 +1193,7 @@ module Unix = struct
       { w= Weak.create 0x100
       ; c= 0 }
 
-    let max = 1024 * 1024
+    let max = 1024 * 1024 * 1024
     let maxl = Int64.of_int max
 
     let heavy_load { fd; max; } cache ~pos ~len =
@@ -1347,6 +1347,10 @@ let fiber1 fpath fpath_provision =
 
   Unix.ro ~fpath >>= fun src ->
   Bos.OS.Path.stat fpath_provision |> Unix.unix.return >>= fun stat ->
+  Us.inj (if stat.U.st_size > 2 * 4096 then
+            Error (`Msg "can't add: data exceeds page size * 2")
+          else
+            Ok ()) >>= fun () ->
   Unix.ro ~fpath:fpath_provision >>= fun provision ->
   make Unix.unix ~load:Unix.load ~get:Unix.get ~fpath src >>= fun t ->
   craft_new_data_section t ~name (Int64.of_int stat.U.st_size) |> Us.inj >>= fun (phdr, n, shdr, psct) ->
