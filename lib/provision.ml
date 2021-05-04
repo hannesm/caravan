@@ -18,10 +18,12 @@ type t = string
 
 external unsafe_of_string : string -> t = "%identity"
 
-let length t = string_get_int64_be t 18 |> Int64.to_int
+let length t =
+  let l = string_get_int64_be t 18 |> Int64.to_int in
+  if l = 0 then invalid_arg "unprovisioned binary, run caravan" else l
 
 let load_bytes t ~src_off buf ~dst_off ~len =
-  let src_len = string_get_int64_be t 18 |> Int64.to_int in
+  let src_len = length t in
   let dst_len = Bytes.length buf in
 
   if len < 0 then Fmt.invalid_arg "len must be positive (%d)" len ;
@@ -34,7 +36,7 @@ let load_bytes t ~src_off buf ~dst_off ~len =
   load_bytes offset buf dst_off len
 
 let load_bigstring t ~src_off buf ~dst_off ~len =
-  let src_len = string_get_int64 t 18 |> Int64.to_int in
+  let src_len = length t in
   let dst_len = Bigstringaf.length buf in
 
   if len < 0 then Fmt.invalid_arg "len must be positive (%d)" len ;
@@ -47,7 +49,7 @@ let load_bigstring t ~src_off buf ~dst_off ~len =
   load_bigstring offset buf dst_off len
 
 let map_bigstring t ~off ~len =
-  let src_len = string_get_int64 t 18 |> Int64.to_int in
+  let src_len = length t in
 
   if len < 0 then Fmt.invalid_arg "len must be positive (%d)" len ;
   if off < 0 || src_len - off < len
