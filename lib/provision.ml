@@ -31,6 +31,8 @@ let load_bytes t ~src_off buf ~dst_off ~len =
   then Fmt.invalid_arg "Invalid destination bounds (dst_off: %d, dst_len: %d, len: %d)" dst_off dst_len len ;
 
   let offset = Int64.add (string_get_int64_be t 10) (Int64.of_int src_off) in
+  print_endline ("offset " ^ string_of_int (Int64.to_int offset));
+  print_endline ("dst_offset " ^ string_of_int dst_off);
   load_bytes offset buf dst_off len
 
 let load_bigstring t ~src_off buf ~dst_off ~len =
