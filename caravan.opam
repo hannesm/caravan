@@ -29,9 +29,3 @@ depends: [
   "mmap"
   "cmdliner"
 ]
-depopts: [
-  "ocaml-freestanding"
-]
-conflicts: [
-  "ocaml-freestanding" {< "0.6.0"}
-]
