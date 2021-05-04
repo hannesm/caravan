@@ -202,8 +202,8 @@ module Bduff = struct
           Logs.msg ~src:src_bduff Logs.Debug
             (fun m -> m "%08Lx: [+] %8Lx byte(s), src:%8Lx > dst:%8Lx [%a]"
                 !cursor len src_off dst_off Fmt.(option string) name) ;
-          if dst_off <> !cursor then return (Error `Invalid_patch)
-          else
+(*          if dst_off <> !cursor then return (Error `Invalid_patch)
+            else *)
             ( try
                 let fd = List.assoc source sources in
                 let len = Int64.to_int len in
@@ -1403,7 +1403,12 @@ let run () a_out provision result =
     >>= fun () -> fiber1 a_out provision
     >>= fun (a_out, _, (vaddr, len)) -> fiber2 a_out vaddr (Int64.of_int len)
     >>= fun a_out ->
-    let res = Bos.OS.Path.move ~force:true a_out result in
+    let res =
+      let open Rresult.R.Infix in
+      Bos.OS.File.read a_out >>= fun data ->
+      Bos.OS.File.write result data
+    in
+    (*    let res = Bos.OS.U.(error_to_msg @@ rename a_out result) in *)
     Unix.unix.return res in
   Us.prj fiber |> function
   | Ok () ->
